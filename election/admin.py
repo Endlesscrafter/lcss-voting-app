@@ -14,4 +14,4 @@ admin.site.register(ElectionCandidateList)
 admin.site.register(Constituency)
 admin.site.register(ElectionArea)
 
-
+# Test

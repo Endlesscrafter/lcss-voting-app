@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.timezone import now
 
 # Create your models here.
 class Party (models.Model):
@@ -15,7 +16,8 @@ class Constituency (models.Model):
 
 class Election (models.Model):
     title = models.CharField(max_length=128)
-    duration  = models.DurationField()
+    startDateTime  = models.DateTimeField(default=now, editable=True)
+    endDateTime = models.DateTimeField(default=now, editable=True)
 
 class ElectionPartyList (models.Model):
     election = models.ForeignKey(Election,on_delete=models.PROTECT)
