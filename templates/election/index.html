@@ -1,18 +1,36 @@
-<head></head>
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
 <body>
-    <p>
-    Hello, world. You're at the generated index.
-    </p>
-    <ol>
-    {% for election in elections %}
-    <li>
-      <a href="{{ election.title }}">{{ election.title }}</a> ({{election.endDateTime}})
-    </li>
-    {% endfor %}
-    </ol>
-
-    <p>
-      {{ certificate }}
-    </p>
+  <div class="container">
+    <ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Wahl Auswählen</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Anleitung zu digitalem Ausweis</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">rechtliche Hinweise</a>
+      </li>
+      <li class="nav-item">
+        <a class="navbar-brand">Willkommen, Herr Mustermann</a>      
+      </li>
+    </ul>
+    <div class="row">
+      <div class="col-sm">
+        <h3>Wählen sie per Mausklick eine Wahl aus, an der Sie teilnehmen möchten.</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <div class="list-group">
+          {% for election in elections %}
+            <a href="{{ election.title }}" class="list-group-item list-group-item-action">{{ election.title }} Gültig bis: ({{election.endDateTime}})</a> 
+          {% endfor %}
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
 </body>
-
