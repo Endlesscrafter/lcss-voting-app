@@ -31,7 +31,7 @@ def index(request):
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
-    certificate = cert_obj.subject.get_attributes_for_oid(NameOID.POSTAL_CODE)#[0].value
+    certificate = cert_obj.subject.get_attributes_for_oid(NameOID.STATE_OR_PROVINCE_NAME)[0].value
 
     elections = electionmodels.Election.objects.filter(endDateTime__gte=now())
 
