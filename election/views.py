@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.loader import *
 from django.utils.timezone import now
+from django.db.models import Q
 
 # url decode
 from urllib.parse import unquote
@@ -31,11 +32,20 @@ def index(request):
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
-    certificate = cert_obj.subject.get_attributes_for_oid(NameOID.STATE_OR_PROVINCE_NAME)[0].value
+    postal_code = cert_obj.subject.get_attributes_for_oid(NameOID.STATE_OR_PROVINCE_NAME)[0].value
 
     elections = electionmodels.Election.objects.filter(endDateTime__gte=now())
 
-    output_dict = {"elections": elections, "certificate": certificate, "name": subject}
+    constituency = electionmodels.Constituency.objects.filter(postal_code=postal_code)[0]
+
+    elections_area = electionmodels.ElectionArea.objects.filter(constituency=constituency)
+
+    elections_result = []
+    for area in elections_area:
+        if(area.election in elections):
+            elections_result.append(area.election)
+
+    output_dict = {"elections": elections_result, "certificate": str(elections_area), "name": subject}
     rendered = render_to_string("index.html", output_dict, request=request)
     return HttpResponse(rendered)
 
