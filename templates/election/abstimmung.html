@@ -26,6 +26,7 @@
     </div>
     <form action="/abgeschlossen" method="POST">
       {% csrf_token %}
+      <input type="hidden" name="WAHL" value="{{wahl}}">
       <div class="row">
         <div class="col-sm-6 form-group">
           <h4>Erststimme :</h4>

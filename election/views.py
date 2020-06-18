@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template.loader import *
 from django.utils.timezone import now
 from django.db.models import Q
+import hashlib
 
 # url decode
 from urllib.parse import unquote
@@ -15,6 +16,7 @@ from cryptography.hazmat.backends import default_backend
 
 # Database Models Import
 import election.models as electionmodels
+from election.models import *
 
 # Create your views here.
 def index(request):
@@ -77,7 +79,7 @@ def election(request, wahl="empty"):
     for ecandidate in election_candidates:
         candidate_result.append(ecandidate.candidate)
 
-    output_dict = {"name": subject, "parties": party_result, "candidates" : candidate_result}
+    output_dict = {"name": subject, "parties": party_result, "candidates" : candidate_result, "wahl": wahl}
     rendered = render_to_string("abstimmung.html", output_dict, request=request)
     return HttpResponse(rendered)
 
@@ -100,15 +102,67 @@ def abgeschlossen(request):
     if(request_method == "POST"):
         form = request.POST
     
-    party = ""
-    if("PARTY" in form.keys()):
-        party = form["PARTY"]
-    
-    candidate = ""
-    if("CANDIDATE" in form.keys()):
-        candidate = form["CANDIDATE"]
+        party = None
+        if("PARTY" in form.keys()):
+                party = form["PARTY"]
+        
+        candidate = None
+        if("CANDIDATE" in form.keys()):
+                candidate = form["CANDIDATE"]
 
-    
+        wahl = "ERROR"
+        if("WAHL" in form.keys()):
+                wahl = form["WAHL"]
+
+        digest = hashlib.sha256()
+        # Hash the certificate
+        digest.update(cert_bytes)
+        votehash = digest.hexdigest()
+
+        # get election
+        election = electionmodels.Election.objects.filter(title=wahl)
+
+        # Save vote
+        v = Voter(voter_hash=votehash,election=election[0]) 
+        v.save()
+
+        # increment party vote
+        if(party != None):
+                party_id = electionmodels.Party.objects.filter(party_name=party)
+                election_party = electionmodels.ElectionPartyList.objects.filter(party=party_id[0],election=election[0])[0]
+                # check if party_vote object already exists
+                pv = electionmodels.PartyVote.objects.filter(elected_party=election_party)
+                
+                if not pv:
+                # empty list, create object
+                        partyvote = PartyVote(elected_party=election_party,number_of_votes=1)
+                        partyvote.save()
+                else:
+                        partyvote = pv[0]
+                        partyvote.number_of_votes += 1
+                        partyvote.save()
+
+        # incremet candidate vote
+        if(candidate != None):
+                candidate_parts = candidate.split("|")
+                candidate_name_parts = candidate_parts[0].split(" ")
+                candidate_first_name = candidate_name_parts[0]
+                candidate_last_name = candidate_name_parts[1]
+
+                candidate_id = electionmodels.Candidate.objects.filter(first_name=candidate_first_name,last_name=candidate_last_name)
+                election_candidate = electionmodels.ElectionCandidateList.objects.filter(candidate=candidate_id[0],election=election[0])[0]
+                # check if party_vote object already exists
+                cv = electionmodels.CandidateVote.objects.filter(elected_candidate=election_candidate)
+                
+                if not cv:
+                # empty list, create object
+                        candidatevote = CandidateVote(elected_candidate=election_candidate,number_of_votes=1)
+                        candidatevote.save()
+                else:
+                        candidatevote = cv[0]
+                        candidatevote.number_of_votes += 1
+                        candidatevote.save()
+
 
     output_dict = {"name": subject, "method": ""}
     rendered = render_to_string("abgeschlosseneWahl.html", output_dict, request=request)
