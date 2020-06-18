@@ -97,9 +97,19 @@ def abgeschlossen(request):
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
-    if(request_method = "POST"):
-        
+    if(request_method == "POST"):
+        form = request.POST
+    
+    party = ""
+    if("PARTY" in form.keys()):
+        party = form["PARTY"]
+    
+    candidate = ""
+    if("CANDIDATE" in form.keys()):
+        candidate = form["CANDIDATE"]
 
-    output_dict = {"name": subject, "method": request_method}
+    
+
+    output_dict = {"name": subject, "method": ""}
     rendered = render_to_string("abgeschlosseneWahl.html", output_dict, request=request)
     return HttpResponse(rendered)
