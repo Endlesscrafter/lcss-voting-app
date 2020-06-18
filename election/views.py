@@ -45,7 +45,7 @@ def index(request):
         if(area.election in elections):
             elections_result.append(area.election)
 
-    output_dict = {"elections": elections_result, "certificate": str(elections_area), "name": subject}
+    output_dict = {"elections": elections_result, "certificate": "", "name": subject}
     rendered = render_to_string("index.html", output_dict, request=request)
     return HttpResponse(rendered)
 
@@ -64,7 +64,20 @@ def election(request, wahl="empty"):
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
-    output_dict = {"name": subject}
+    election = electionmodels.Election.objects.filter(title=wahl)
+
+    election_parties = electionmodels.ElectionPartyList.objects.filter(election=election[0])
+    election_candidates = electionmodels.ElectionCandidateList.objects.filter(election=election[0])
+
+    party_result = []
+    for eparty in election_parties:
+        party_result.append(eparty.party)
+
+    candidate_result = []
+    for ecandidate in election_candidates:
+        candidate_result.append(ecandidate.candidate)
+
+    output_dict = {"name": subject, "parties": party_result, "candidates" : candidate_result}
     rendered = render_to_string("abstimmung.html", output_dict, request=request)
     return HttpResponse(rendered)
 
@@ -83,6 +96,9 @@ def abgeschlossen(request):
 
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
+
+    if(request_method = "POST"):
+        
 
     output_dict = {"name": subject, "method": request_method}
     rendered = render_to_string("abgeschlosseneWahl.html", output_dict, request=request)
