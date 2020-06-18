@@ -18,7 +18,7 @@ import election.models as electionmodels
 # Create your views here.
 def index(request):
     try:
-    	cert_urlencoded = request.headers["X-Client-Certificate"]
+        cert_urlencoded = request.headers["X-Client-Certificate"]
     except KeyError:
         cert_urlencoded = None
     certificate = ""
@@ -36,12 +36,12 @@ def index(request):
     elections = electionmodels.Election.objects.filter(endDateTime__gte=now())
 
     output_dict = {"elections": elections, "certificate": certificate, "name": subject}
-    rendered = render_to_string("index.html", output_dict)
+    rendered = render_to_string("index.html", output_dict, request=request)
     return HttpResponse(rendered)
 
 def election(request, wahl="empty"):
     try:
-    	cert_urlencoded = request.headers["X-Client-Certificate"]
+        cert_urlencoded = request.headers["X-Client-Certificate"]
     except KeyError:
         cert_urlencoded = None
     certificate = ""
@@ -55,12 +55,13 @@ def election(request, wahl="empty"):
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
     output_dict = {"name": subject}
-    rendered = render_to_string("abstimmung.html", output_dict)
+    rendered = render_to_string("abstimmung.html", output_dict, request=request)
     return HttpResponse(rendered)
 
 def abgeschlossen(request):
     try:
-    	cert_urlencoded = request.headers["X-Client-Certificate"]
+        cert_urlencoded = request.headers["X-Client-Certificate"]
+        request_method = request.method
     except KeyError:
         cert_urlencoded = None
     certificate = ""
@@ -73,6 +74,6 @@ def abgeschlossen(request):
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
-    output_dict = {"name": subject}
-    rendered = render_to_string("abgeschlosseneWahl.html", output_dict)
+    output_dict = {"name": subject, "method": request_method}
+    rendered = render_to_string("abgeschlosseneWahl.html", output_dict, request=request)
     return HttpResponse(rendered)

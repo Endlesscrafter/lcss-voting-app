@@ -24,9 +24,10 @@
         <h3 class="text-center" padding="3">Bitte treffen Sie ihre Wahl zur Erst- und Zweitstimme.</h3>
       </div>
     </div>
-    <div class="row">
-      <form>
-        <div class="col-sm-6">
+    <form action="/abgeschlossen" method="POST">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-sm-6 form-group">
           <h4>Erststimme :</h4>
           <div class="form-check">
             <input class="form-check-input" type="radio" name="exampleRadios1" id="exampleRadios1" value="option1">
@@ -47,30 +48,30 @@
             </label>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-6 form-group">
           <h4>Zweitstimme :</h4>
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1">
-            <label class="form-check-label" for="exampleRadios1">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios4" value="option1">
+            <label class="form-check-label" for="exampleRadios4">
               Peter Müller, CDU
             </label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-            <label class="form-check-label" for="exampleRadios2">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios5" value="option2">
+            <label class="form-check-label" for="exampleRadios5">
               Max Mustermann, SPD
             </label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-            <label class="form-check-label" for="exampleRadios3">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios6" value="option3">
+            <label class="form-check-label" for="exampleRadios6">
               Melina Muster, FDP
             </label>
           </div>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
   </div>
 </body>
