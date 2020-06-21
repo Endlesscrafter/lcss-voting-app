@@ -34,12 +34,16 @@ def index(request):
     # Get the name of the person
     subject = cert_obj.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
 
+    # Get the postal code of the person
     postal_code = cert_obj.subject.get_attributes_for_oid(NameOID.STATE_OR_PROVINCE_NAME)[0].value
 
+    # Filter elections by date (only show those, where the time to vote is not over)
     elections = electionmodels.Election.objects.filter(endDateTime__gte=now())
 
+    # Filter constituencies by postal code
     constituency = electionmodels.Constituency.objects.filter(postal_code=postal_code)[0]
 
+    # get the election area (all elections taking place in a constituency), filter by constituency
     elections_area = electionmodels.ElectionArea.objects.filter(constituency=constituency)
 
     elections_result = []
@@ -47,7 +51,24 @@ def index(request):
         if(area.election in elections):
             elections_result.append(area.election)
 
-    output_dict = {"elections": elections_result, "certificate": "", "name": subject}
+    # compute cert hash
+    digest = hashlib.sha256()
+    # Hash the certificate
+    digest.update(cert_bytes)
+    votehash = digest.hexdigest()
+
+    # Get all votes of this person for every election
+    already_voted_elections = []
+    for election in elections:
+        voters = electionmodels.Voter.objects.filter(voter_hash=votehash,election=election)
+        # Check if at least one vote was cast
+        if(voters):
+            already_voted_elections.append(election)
+
+    # remove already voted election from list
+    eligible_elections = [i for i in elections_result if i not in already_voted_elections ]
+
+    output_dict = {"elections": eligible_elections, "certificate": "", "name": subject}
     rendered = render_to_string("index.html", output_dict, request=request)
     return HttpResponse(rendered)
 

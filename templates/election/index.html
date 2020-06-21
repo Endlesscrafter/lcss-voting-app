@@ -28,8 +28,10 @@
       <div class="col-sm">
         <div class="list-group">
           {% for election in elections %}
-          <a href="election/{{ election.title }}" class="list-group-item list-group-item-action">{{ election.title }} Gültig bis:
+          <a href="election/{{ election.title }}" class="list-group-item list-group-item-action"><b>{{ election.title }}</b> <br/> Abstimmung möglich bis:
             ({{election.endDateTime}})</a>
+          {% empty %}
+            Sie haben an allen offenen Wahlen bereits teilgenommen oder es finden aktuell keine Wahlen statt.
           {% endfor %}
         </div>
       </div>
